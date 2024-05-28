@@ -5,7 +5,10 @@ const DATA_API = {
 export async function fetchHomePageData() {
   return fetch(`${DATA_API.baseUrl}/home.json`)
     .then((res) => res.json())
-    .catch((err) => console.error(err));
+    .catch((err) => {
+      console.error(`Error fetching home page data`, err);
+      throw Error(`Error fetching home page data`);
+    });
 }
 
 export async function getRefIdSets(refId) {

@@ -57,7 +57,7 @@ button {
   padding: 20px;
   border-radius: 10px;
   color: white;
-  background-color: #1a1d29;
+  /* background-color: #1a1d29; */
   height: 400px;
   width: 600px;
 }
@@ -92,4 +92,23 @@ button {
 
 .default-image-container {
   position: relative;
+}
+
+.modal-img {
+  height: 400px;
+}
+
+.modal-div {
+  position: absolute;
+  padding: 10px;
+}
+
+.error-page {
+  color: white;
+  font-family: sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.11px;
+  line-height: 1.4;
+  text-align: center;
 }

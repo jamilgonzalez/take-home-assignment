@@ -1,6 +1,6 @@
 import { getRefIdSets } from "./interactor/dataApi.mjs";
 
-import url from "./assets/default_tile.png";
+import defaultImage from "./assets/default_tile.png";
 
 export function getHomePageSets(body) {
   const {
@@ -68,89 +68,97 @@ export function imageSrc(item) {
   };
 }
 
+export function createTiles(rowContent, parent) {
+  // create tiles
+  rowContent.forEach((content) => {
+    const { imgSrc, modalContent } = content;
+    // create image tile
+    const img = document.createElement("img");
+    img.src = imgSrc;
+
+    // handle image loading error
+    img.onerror = function () {
+      img.src = defaultImage;
+
+      const div = document.createElement("div");
+      div.className = "default-image-container";
+
+      const title = document.createElement("h1");
+      title.innerText = modalContent.title;
+      title.className = "default-image-text";
+
+      div.append(title, img);
+      tile.append(div);
+    };
+
+    // configure tile
+    const tile = document.createElement("button");
+    // give it styling
+    tile.className = "tile";
+    // set the onclick event
+    tile.onclick = function () {
+      if (document.getElementById("modal")) return;
+
+      // create modal and overlay
+      const modal = document.createElement("div");
+      modal.id = "modal";
+
+      const img = document.createElement("img");
+      img.className = "modal-img";
+      img.src = modalContent.imgSrc;
+
+      img.onerror = function () {
+        img.src = defaultImage;
+      };
+
+      const contentDiv = document.createElement("div");
+      contentDiv.className = "modal-div";
+      // create text to show
+      const h1 = document.createElement("h1");
+      h1.innerText = modalContent.title;
+
+      const ratingsTitle = document.createElement("h3");
+      ratingsTitle.innerText = "Ratings";
+
+      const ratings = document.createElement("p");
+      ratings.innerText = modalContent.ratings.map(
+        (rating) => `${rating.system} ${rating.value}`
+      );
+
+      contentDiv.append(h1, ratingsTitle, ratings);
+      modal.append(contentDiv, img);
+
+      const overlay = document.createElement("div");
+      overlay.className = "overlay";
+      document.body.append(modal, overlay);
+    };
+
+    tile.append(img);
+    parent.append(tile);
+  });
+}
+
 export function generateUI(containerDetails) {
   const root = document.getElementById("root");
 
-  containerDetails.forEach(({ title, rowContent, refId }, i) => {
+  containerDetails.forEach(({ title, rowContent, refId }) => {
     // create container title element
     const rowTitle = document.createElement("div");
-    rowTitle.className = "container-title";
+    rowTitle.classList.add("container-title");
     rowTitle.innerText = title;
+
+    if (refId) rowTitle.id = refId;
 
     // create content row element
     const contentRow = document.createElement("div");
     contentRow.className = "content-row";
 
-    // create tiles
-    rowContent.forEach((content, j) => {
-      const { imgSrc, modalContent } = content;
-      // create image tile
-      const img = document.createElement("img");
+    createTiles(rowContent, contentRow);
 
-      img.src = imgSrc;
-
-      // configure tile
-      const tile = document.createElement("button");
-      // give it styling
-      tile.className = "tile";
-      // set the onclick event
-      tile.onclick = function () {
-        if (document.getElementById("modal")) return;
-
-        // create modal and overlay
-        const modal = document.createElement("div");
-        modal.id = "modal";
-
-        const overlay = document.createElement("div");
-        overlay.className = "overlay";
-
-        // create text to show
-        const h1 = document.createElement("h1");
-        h1.innerText = modalContent.title;
-
-        const ratingsTitle = document.createElement("h3");
-        ratingsTitle.innerText = "Ratings";
-
-        const ratings = document.createElement("p");
-        ratings.innerText = modalContent.ratings.map(
-          (rating) => `${rating.system} ${rating.value}`
-        );
-
-        modal.appendChild(h1);
-        modal.appendChild(ratingsTitle);
-        modal.appendChild(ratings);
-
-        document.body.appendChild(modal);
-        document.body.appendChild(overlay);
-      };
-
-      img.onerror = function () {
-        img.src = url;
-
-        const div = document.createElement("div");
-        div.className = "default-image-container";
-
-        const title = document.createElement("h1");
-        title.innerText = modalContent.title;
-        title.className = "default-image-text";
-
-        div.appendChild(title);
-        div.appendChild(img);
-        tile.appendChild(div);
-      };
-
-      tile.appendChild(img);
-      contentRow.appendChild(tile);
-
-      // todo: do this somewhere else
-      if (i === 0 && j === 0) {
-        tile.classList.add("focused");
-      }
-    });
-
-    root.appendChild(rowTitle);
-    root.appendChild(contentRow);
+    root.append(rowTitle, contentRow);
   });
+
+  return containerDetails.filter((row) => row.refId);
 }
 
 export function registerNavEventListener() {
@@ -160,6 +168,7 @@ export function registerNavEventListener() {
     if (!focused) return;
 
     const tiles = document.querySelectorAll(".tile");
+
     let index = Array.from(tiles).indexOf(focused);
 
     switch (e.key) {
