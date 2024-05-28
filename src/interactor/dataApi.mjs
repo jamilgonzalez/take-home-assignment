@@ -3,12 +3,7 @@ const DATA_API = {
 };
 
 export async function fetchHomePageData() {
-  return fetch(`${DATA_API.baseUrl}/home.json`)
-    .then((res) => res.json())
-    .catch((err) => {
-      console.error(`Error fetching home page data`, err);
-      throw Error(`Error fetching home page data`);
-    });
+  return fetch(`${DATA_API.baseUrl}/home.json`).then((res) => res.json());
 }
 
 export async function getRefIdSets(refId) {

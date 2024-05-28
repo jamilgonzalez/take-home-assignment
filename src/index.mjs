@@ -11,7 +11,7 @@ fetchHomePageData()
   .then(getHomePageSets)
   .then(generateUI)
   .then((refSetData) => {
-    // lazy load the content rows
+    // lazy load the "ref" sets
     setTimeout(() => {
       let observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
@@ -29,10 +29,10 @@ fetchHomePageData()
                 row.nextSibling.replaceWith(contentRow);
               })
               .catch((err) => {
-                console.error(
-                  `Error fetching data for ${entry.target.id}`,
-                  err
-                );
+                // remove the row if there is an error
+                // add monitoring so that we are alerted when this happens
+                console.log(`Error fetching data for ${entry.target.id}`, err);
+                row.remove();
               })
               .then(() => {
                 observer.unobserve(entry.target);
@@ -54,9 +54,9 @@ fetchHomePageData()
   })
   .then(registerNavEventListener)
   .catch((err) => {
-    console.error(err);
-    // display error page
+    console.error(`Error fetching home page data`, err);
 
+    // display error page
     const root = document.getElementById("root");
     const errorPage = document.createElement("div");
     errorPage.className = "error-page";
