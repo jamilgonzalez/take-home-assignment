@@ -32,7 +32,7 @@ export function getHomePageSets(body) {
 }
 
 export function rowContent(item) {
-  const { image = {}, text = {}, ratings = [] } = item;
+  const { image = {}, text = {}, ratings = [], collectionId = "" } = item;
   const title =
     text?.title?.full?.series?.default?.content ??
     text?.title?.full?.program?.default?.content ??
@@ -40,6 +40,7 @@ export function rowContent(item) {
     text?.title?.full?.collection?.default?.content;
 
   return {
+    collectionId,
     tileContent: {
       imgSrc:
         image?.tile?.["1.78"]?.series?.default?.url ??
@@ -61,7 +62,7 @@ export function rowContent(item) {
 
 export function createTiles(rowContent, parentElement) {
   rowContent.forEach((content) => {
-    const { tileContent, modalContent } = content;
+    const { collectionId, tileContent, modalContent } = content;
     const tile = document.createElement("button");
     tile.className = "tile";
 
@@ -85,6 +86,11 @@ export function createTiles(rowContent, parentElement) {
     };
 
     tile.onclick = function () {
+      if (collectionId) {
+        console.log("Navigate to collection page", collectionId);
+        return;
+      }
+
       if (document.getElementById("modal")) return;
 
       // create modal and overlay
@@ -102,7 +108,7 @@ export function createTiles(rowContent, parentElement) {
         modalContent.ratings.length === 0 || !modalContent.title;
 
       if (hasContentFailedToLoad) {
-        console.log("Modal content failed to load");
+        console.log("Modal content failed to load", modalContent);
         const errorModal = document.createElement("div");
         errorModal.className = "error-modal";
         errorModal.innerText =
@@ -155,6 +161,7 @@ export function generateUI(containerDetails) {
 
   return containerDetails.filter((row) => row.refId);
 }
+
 let x = 0;
 let y = 0;
 export function registerNavEventListener(contentGrid) {
