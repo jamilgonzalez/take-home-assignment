@@ -3,31 +3,18 @@ import {
   getHomePageSets,
   generateUI,
   registerNavEventListener,
-  lazyLoadCallback,
+  setRefSetLazyLoadObserver,
+  setFocusOnFirstTile,
+  populateContentGrid,
 } from "./utils.mjs";
-
-const LAZY_LOAD_DELAY = 5;
 
 fetchHomePageData()
   .then(getHomePageSets)
   .then(generateUI)
-  .then((refSetData) => {
-    // lazy load the "ref" sets
-    setTimeout(() => {
-      let observer = new IntersectionObserver(lazyLoadCallback);
-      refSetData.forEach((row) => {
-        let target = document.getElementById(row.refId);
-        observer.observe(target);
-      });
-    }, LAZY_LOAD_DELAY);
-  })
-  .then(() => {
-    // focus on the first tile on page load
-    const tiles = document.querySelectorAll(".tile");
-    if (tiles.length > 0) tiles[0]?.classList.add("focused");
-  })
+  .then(setRefSetLazyLoadObserver)
+  .then(populateContentGrid)
+  .then(setFocusOnFirstTile)
   .then(registerNavEventListener)
-
   .catch((err) => {
     console.error(`Error fetching home page data`, err);
     // display error page

@@ -150,40 +150,35 @@ export function generateUI(containerDetails) {
     contentRow.className = "content-row";
 
     createTiles(rowContent, contentRow);
-
     root.append(rowTitle, contentRow);
   });
 
   return containerDetails.filter((row) => row.refId);
 }
-
-export function registerNavEventListener() {
+let x = 0;
+let y = 0;
+export function registerNavEventListener(contentGrid) {
   // navigation and tile interaction
   document.addEventListener("keydown", (e) => {
     const focused = document.querySelector(".focused");
-
     if (!focused) return;
-
-    const tiles = document.querySelectorAll(".tile");
-    let index = Array.from(tiles).indexOf(focused);
-    let nextTileIndex;
 
     switch (e.key) {
       case "ArrowRight":
-        if (index === tiles.length - 1) return;
-
-        tiles[index + 1]?.classList.add("focused");
-        tiles[index + 1]?.scrollIntoView({
+        if (x === contentGrid[y].length - 1) return;
+        x += 1;
+        contentGrid[y][x]?.classList.add("focused");
+        contentGrid[y][x]?.scrollIntoView({
           behavior: "smooth",
           block: "center",
         });
         focused.classList.remove("focused");
         break;
       case "ArrowLeft":
-        if (index === 0) return;
-
-        tiles[index - 1]?.classList.add("focused");
-        tiles[index - 1]?.scrollIntoView({
+        if (x === 0) return;
+        x -= 1;
+        contentGrid[y][x]?.classList.add("focused");
+        contentGrid[y][x]?.scrollIntoView({
           behavior: "smooth",
           block: "center",
         });
@@ -191,21 +186,22 @@ export function registerNavEventListener() {
 
         break;
       case "ArrowDown":
-        nextTileIndex = focused.parentElement.children.length;
-        if (index + nextTileIndex >= tiles.length) return;
-
-        tiles[index + nextTileIndex]?.classList.add("focused");
-        tiles[index + nextTileIndex]?.scrollIntoView({
+        // when rows are loaded dynamically, we need to update the contentGrid
+        contentGrid = populateContentGrid();
+        if (y === contentGrid.length - 1) return;
+        y += 1;
+        contentGrid[y][x]?.classList.add("focused");
+        contentGrid[y][x]?.scrollIntoView({
           behavior: "smooth",
           block: "center",
         });
         focused.classList.remove("focused");
         break;
       case "ArrowUp":
-        nextTileIndex = focused.parentElement.children.length;
-        if (index - nextTileIndex < 0) return;
-        tiles[index - nextTileIndex]?.classList.add("focused");
-        tiles[index - nextTileIndex]?.scrollIntoView({
+        if (y === 0) return;
+        y -= 1;
+        contentGrid[y][x]?.classList.add("focused");
+        contentGrid[y][x]?.scrollIntoView({
           behavior: "smooth",
           block: "center",
         });
@@ -225,6 +221,20 @@ export function registerNavEventListener() {
     }
   });
 }
+
+export const setRefSetLazyLoadObserver = (refSetData) => {
+  const LAZY_LOAD_DELAY = 5;
+  // lazy load the "ref" sets
+  setTimeout(() => {
+    let observer = new IntersectionObserver(lazyLoadCallback, {
+      rootMargin: "100px",
+    });
+    refSetData.forEach((row) => {
+      let target = document.getElementById(row.refId);
+      observer.observe(target);
+    });
+  }, LAZY_LOAD_DELAY);
+};
 
 export const lazyLoadCallback = (entries, observer) => {
   entries.forEach((entry) => {
@@ -252,4 +262,18 @@ export const lazyLoadCallback = (entries, observer) => {
         });
     }
   });
+};
+
+export const setFocusOnFirstTile = (tileBoard) => {
+  if (tileBoard.length > 0) tileBoard[0][0]?.classList.add("focused");
+  return tileBoard;
+};
+
+export const populateContentGrid = () => {
+  const contentRows = document.querySelectorAll(".content-row");
+  return Array.from(contentRows)
+    .map((row) => {
+      return row.children;
+    })
+    .filter((row) => row.length > 0);
 };
