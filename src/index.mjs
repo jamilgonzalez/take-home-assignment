@@ -7,7 +7,7 @@ import {
   setRefSetLazyLoadObserver,
   setFocusOnFirstTile,
   populateContentGrid,
-} from "./utils.mjs";
+} from "./app/index.mjs";
 
 fetchHomePageData()
   .then(getHomePageSets)
