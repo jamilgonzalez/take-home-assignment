@@ -1,3 +1,4 @@
+import "./index.css";
 import { fetchHomePageData } from "./interactor/dataApi.mjs";
 import {
   getHomePageSets,
