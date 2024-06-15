@@ -1,3 +1,4 @@
+import "./index.css";
 import { fetchHomePageData } from "./interactor/dataApi.mjs";
 import {
   getHomePageSets,
@@ -6,7 +7,7 @@ import {
   setRefSetLazyLoadObserver,
   setFocusOnFirstTile,
   populateContentGrid,
-} from "./utils.mjs";
+} from "./app/index.mjs";
 
 fetchHomePageData()
   .then(getHomePageSets)

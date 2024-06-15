@@ -5,7 +5,7 @@ module.exports = {
   entry: "./src/index.mjs",
   mode: "development",
   output: {
-    path: path.resolve(__dirname, "public"),
+    path: path.resolve(__dirname, "dist"),
     filename: "index.js",
   },
   plugins: [
@@ -25,6 +25,10 @@ module.exports = {
             outputPath: "images/",
           },
         },
+      },
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"],
       },
     ],
   },
